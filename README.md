@@ -58,14 +58,16 @@ https://www.bookswagon.com/books/c/{isbn}
 
 Data was fetched using HTTP GET requests and parsed with BeautifulSoup.
 
+Open the `FinalScraper.ipynb` for more information about the whole process.
+
 ## ⚠️ Data Corruption Incident
 - A critical issue occurred during data cleaning due to incorrect file handling:
 
-  > Incorrect 
+  > ❌ Incorrect 
 
    pd.read_csv("books.xlsx")
 
-  > Correct
+  > ✅ Correct
 
    pd.read_excel("books.xlsx")
 
@@ -76,7 +78,9 @@ Data was fetched using HTTP GET requests and parsed with BeautifulSoup.
 ## Transformation
 Scraping Strategy
 
-- Query OpenLibrary for summary & keywords
+- Query Google API for summary & keywords
+
+- Query OpenLibrary for the same
 
 - If missing, fallback to Bookswagon
 
