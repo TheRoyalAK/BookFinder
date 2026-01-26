@@ -120,3 +120,23 @@ End Points
 - FastAPI     
 - REST APIs     
 ## 
+
+
+## File Descriptions
+
+- `Accession Register-Books_with_ISBN_numbers.csv`: file provided by the RC.
+- `Accession Register-Books_with_ISBN_numbers.xlsx`: cleaned file in `.xlsx`
+- `AccNo_ISBN.csv`: List of AccNo and ISBN only.
+- `AccNoISBN.ipynb`: The raw `.ipynb` which we worked in (not that readable due to many tests).
+- `API.py`: Contains the FastAPI code to run the server.
+- `books.db`: The database created using SQLite3.
+- `books_cleaned.csv`: Data collected from others (for more details check `FinalScraper.ipynb`).
+- `books_cleaned.xlsx`: Cleaned version of `books_cleaned.csv`.
+- `CleanedData.xlsx`: Data scrapped from RC (not used and stopped later).
+- `Final_cleaned_data.xlsx`: Final data that was stored in the database.
+- `Final_scraper.ipynb`: Readable version of `AccNoISBN.ipynb`.
+- `New_AccNo.csv`: List of AccNo, AccDate and ISBN only.
+- `NoISBN.xlsx`: Books that have wrong ISBN or None as their ISBN.
+- `notFound.txt`: ISBNs that were not valid.
+- `post_to_db.py`: Python file to convert `Final_cleaned_data.xlsx` into `books.db` using SQLite3 and Pandas.
+- `Summaries.xlsx`: A few summaries and keywords that were scraped using our scraper.
