@@ -2,10 +2,26 @@
 
 <p align='right'> Anish Karmakar - 202518061<br> Shah Trush - 202518027</p>
 
-----------------------------
 > [!NOTE]
 > This project is about building a robust data pipeline to extract, clean, and store book information (titles, descriptions, genres) to provide a high-quality dataset for an ML-powered semantic search system.
-----------------------------
+
+## Table of Contents
+- [Project Objectives](#project-objectives)
+- [Data Ingestion](#data-ingestion)
+  - [Problems in the Raw Dataset](#problems-in-the-raw-dataset)
+  - [External Data Sources](#external-data-sources)
+  - [Scraping Strategy](#scraping-strategy)
+- [Transformation](#transformation)
+- [Storage](#storage)
+  - [Standardized Schema](#standardized-schema)
+- [API Serving (FastAPI)](#api-serving-fastapi)
+- [Tech Stack](#tech-stack)
+- [File Descriptions](#file-descriptions)
+- [Final Data Statistics](#final-data-statistics)
+- [Setup](#setup)
+  - [Prerequisites](#one-time-installation-of-required-libraries)
+  - [Methods](#to-setup-the-server-in-your-local-system-there-are-two-methods-depending-on-your-need)
+- [Workflow](#workflow)
 
 ## Project Objectives
 
@@ -15,9 +31,9 @@
 - Store structured data in a relational database
 - Serve data via RESTful endpoints
 
----
-
 ## Data Ingestion
+
+Initial data was taken from the College RC.
 
 ### Problems in the Raw Dataset
 
@@ -30,59 +46,25 @@ Missing ISBNs
 Inconsistent author formatting
 ```
 
-## Standardized Schema
-- Accession Number
-- Accession Date
-- Book Title
-- ISBN
-- Author / Editor
-- Place & Publisher
-- Year
-- Pages
-- Class No / Book No
-- Category
-- Summary / Description
+### External Data Sources
 
-## External Data Sources
-Google Books API  → Fast metadata retrieval
+- OpenLibrary       → Extensive coverage and summaries ("https://www.openlibrary.org/isbn/{isbn}.json")
 
-https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}
+- Bookswagon        → Fallback for missing details ("https://www.bookswagon.com/books/c/{isbn}")
 
-OpenLibrary       → Extensive coverage and summaries
-
-https://www.openlibrary.org/isbn/{isbn}.json
-
-Bookswagon        → Fallback for missing details
-
-https://www.bookswagon.com/books/c/{isbn}
+- Google Books API  → Fast metadata retrieval ("https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}")
 
 Data was fetched using HTTP GET requests and parsed with BeautifulSoup.
 
 Open the `FinalScraper.ipynb` for more information about the whole process.
 
-## ⚠️ Data Corruption Incident
-- A critical issue occurred during data cleaning due to incorrect file handling:
+### Scraping Strategy
 
-  > ❌ Incorrect 
+- Query OpenLibrary for the summary & keywords
 
-   pd.read_csv("books.xlsx")
+- If anything is missing, fallback to Bookswagon
 
-  > ✅ Correct
-
-   pd.read_excel("books.xlsx")
-
-- This resulted in Excel file corruption and required rebuilding the dataset.
-
-- Lesson learned: Always validate file formats and maintain backups during transformation.
-
-## Transformation
-Scraping Strategy
-
-- Query Google API for summary & keywords
-
-- Query OpenLibrary for the same
-
-- If missing, fallback to Bookswagon
+- If anything still remains, fallback to Google API (last due to API key Quota limits)
 
 - Prefer longer and more descriptive summaries
 
@@ -96,47 +78,117 @@ Challanges
 
 - Time constraints
 
-### The dataset was completed through <I> collaboration </I> after optimization attempts.
+## Transformation
+
+* Removed ?? (placeholder for different language texts e.g. Devanagari, Vardana, etc)
+* Fixed a few ISBNs that had typos.
+* Fixed publisher location
+* Fixed Accession Dates
+* Ed./Vol. was merged with Title
+* Removed \n and some html tags from summaries
 
 ## Storage
-Database: SQLite3
+Database: `SQLite3`
 
-Method: pandas.DataFrame.to_sql()
+Method: `pandas.DataFrame.to_sql()`
+
+
+### Standardized Schema:
+Column Name| Column Description
+---|---
+AccNo|Accession Number
+AccDate| Accession Date
+Title|Name of the book
+ISBN|ISBN of the book (given by RC)
+ISBN13|ISBN13 of the book
+Author|Author of the book
+Publisher|Place and publisher of the book
+Year|Year of publishing the book
+Pages|Number of pages in the book
+DDC|Class No./Book No. provided by the RC
+Keywords|Special keywords of the book (e.g. category, genre, etc)
+Summary|Short description about the book
+
 
 ## API Serving (FastAPI)
 End Points
 
- - "/"  for learning about FastAPI, to see whether it works or not.
+ - `/`  for learning about FastAPI, to see whether it works or not.
    
- - "/books" this endpoint has an optional parameter limit, if left empty, it will fetch all the books in the database, and if given a value, it will fetch the latest books as per the value given.
+ - `/books` this endpoint has an optional parameter limit, if left empty, it will fetch all the books in the database, and if given a value, it will fetch the latest books as per the value given.
    
- - /books/{isbn}" This endpoint searches for the given ISBN in the DB and returns all the book details associated with it.
+ - `/books/{ID}` This endpoint searches for the given `ID` (which can be either AccNo, ISBN, ISBN13 or DDC) in the DB and returns all the book details associated with it.
 
 ## Tech Stack
 - Python     
 - Pandas     
 - BeautifulSoup     
 - SQLite3     
-- FastAPI     
-- REST APIs     
-## 
+- FastAPI   
 
 
 ## File Descriptions
+File name | File Description
+---|---
+`Accession Register-Books_with_ISBN_numbers.csv`|file provided by the RC.
+`Accession Register-Books_with_ISBN_numbers.xlsx`|cleaned file in `.xlsx`
+`AccNoISBN.ipynb`|The raw `.ipynb` which we worked in (not that readable due to many tests).
+`API.py`|Contains the FastAPI code to run the server.
+`books.db`|The database created using SQLite3.
+`Final_Data.xlsx`|Final data that was stored in the database.
+`Final_scraper.ipynb`|Readable version of `AccNoISBN.ipynb`.
+`NoISBN.xlsx`|Books that have wrong ISBN or None as their ISBN.
+`post_to_db.py`|Python file to convert `Final_Data.xlsx` into `books.db` using SQLite3 and Pandas.
+`requirements.txt`|Requirements for setting up the server in the local system.
+`./Summaries/`|Contains the summaries of all the books (in batches of 10) made by using the `scrap_and_save()` function inside `Final_scraper.ipynb`.
+`./Extra/`|Contains the files that were made when scraping from the RC website (was not used later).
 
-- `Accession Register-Books_with_ISBN_numbers.csv`: file provided by the RC.
-- `Accession Register-Books_with_ISBN_numbers.xlsx`: cleaned file in `.xlsx`
-- `AccNo_ISBN.csv`: List of AccNo and ISBN only.
-- `AccNoISBN.ipynb`: The raw `.ipynb` which we worked in (not that readable due to many tests).
-- `API.py`: Contains the FastAPI code to run the server.
-- `books.db`: The database created using SQLite3.
-- `books_cleaned.csv`: Data collected from others (for more details check `FinalScraper.ipynb`).
-- `books_cleaned.xlsx`: Cleaned version of `books_cleaned.csv`.
-- `CleanedData.xlsx`: Data scrapped from RC (not used and stopped later).
-- `Final_cleaned_data.xlsx`: Final data that was stored in the database.
-- `Final_scraper.ipynb`: Readable version of `AccNoISBN.ipynb`.
-- `New_AccNo.csv`: List of AccNo, AccDate and ISBN only.
-- `NoISBN.xlsx`: Books that have wrong ISBN or None as their ISBN.
-- `notFound.txt`: ISBNs that were not valid.
-- `post_to_db.py`: Python file to convert `Final_cleaned_data.xlsx` into `books.db` using SQLite3 and Pandas.
-- `Summaries.xlsx`: A few summaries and keywords that were scraped using our scraper.
+
+
+## Final Data Statistics
+
+Type of Data | Number of books | Percentage of books
+---|---|---
+Total books with unique ISBNs|31532
+Books with no summaries|4006 |12.70%
+Books with no keywords|4268 |13.54%
+Books with neither summary nor keywords|3391 |10.75%
+Books with both summary and keywords|26649 |84.51%
+
+## Setup
+
+It is not recommended to scrap for the data again as it took 17 hours to scrap this detailed data. And hence the modules for that are not written inside `requirements.txt`.
+
+If you still want to execute the whole procedure on your system, follow the instructions mentioned in the section [Workflow](#workflow).
+
+### Prerequisites
+
+In a command prompt shell, open the repository folder and run `pip install -r requirements.txt`
+
+
+### To setup the server in your local system, there are two methods depending on your need:
+
+* If you are okay with hosting the at `127.0.0.1:8000`:
+  1. Open Command Prompt in the folder where `API.py` is located.
+  2. Run `python API.py`
+  3. The server has started at `127.0.0.1:8000` !
+
+* If you want to host the server at your own choice of address and port:
+  1. Open Command Prompt in the folder where `API.py` is located.
+  2. Run `uvicorn API:app -h <address> -p <port>`
+  3. Now the server has started at the address and port of your choice!
+
+
+## Workflow
+
+If you want to do the whole process again and on your own, follow these instructions:
+
+1. Install the required libraries using `pip`
+    - To identify the required libraries, open `FinalScraper.ipynb` and check the __Useful Imports__ section for all the libraries used.
+2. Clean your source data as needed and make sure to convert it into `.xlsx` (Generally better for complex texts than `.csv` due to delimiters).
+3. Start running the cells inside `FinalScraper.ipynb` one by one.
+    - While doing this, you might get into errors like "No file found" or "Key Error", in that case check if your data has the same structure and name as `Accession Register-Books_with_ISBN_numbers.xlsx`.
+4. After executing all the cells you will now have `Final_Data.xlsx`.
+    - Optional: You can clean this more using Excel tricks.
+5. Now open command prompt and run `python post_to_db.py` to make the database file.
+6. For further help, go [here](#to-setup-the-server-in-your-local-system-there-are-two-methods-depending-on-your-need).

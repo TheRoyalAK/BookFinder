@@ -24,7 +24,7 @@ def root():
 
 @app.get("/books")
 def get_books(
-    limit: int = Query(None, ge=1, le=10906, description="Number of books to fetch (leave empty if trying to fetch all)")
+    limit: int = Query(None, ge=1, le=31532, description="Number of books to fetch (leave empty if trying to fetch all)")
 ):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -33,7 +33,6 @@ def get_books(
         cursor.execute("""
             SELECT *
             FROM book
-            WHERE description IS NOT NULL
             ORDER BY AccDate DESC
         """)
         books = [dict(row) for row in cursor.fetchall()]
@@ -43,8 +42,7 @@ def get_books(
     cursor.execute("""
         SELECT *
         FROM book
-        WHERE description IS NOT NULL
-        ORDER BY AccDate DESC
+        ORDER BY AccNo
         LIMIT ?
     """, (limit, ))
 
@@ -57,9 +55,9 @@ def get_books(
         "data": books
     }
 
-@app.get("/books/{isbn}")
-def get_book_by_isbn_path(isbn: str):
-    isbn = isbn.strip().replace("-", "")
+@app.get("/books/{id}")
+def get_book_by_isbn_path(id: str):
+    id = id.strip().replace("-", "")
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -67,8 +65,8 @@ def get_book_by_isbn_path(isbn: str):
     cursor.execute("""
         SELECT *
         FROM book
-        WHERE ISBN = ?
-    """, (isbn,))
+        WHERE ISBN = ? OR ISBN13 = ? OR AccNo = ? OR DDC = ?
+    """, (id, id, id, id))
 
     row = cursor.fetchone()
     conn.close()
@@ -77,3 +75,7 @@ def get_book_by_isbn_path(isbn: str):
         raise HTTPException(status_code=404, detail="Book not found")
 
     return dict(row)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host='127.0.0.1', port=8000)
