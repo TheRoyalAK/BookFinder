@@ -107,7 +107,7 @@ Year|Year of publishing the book
 Pages|Number of pages in the book
 DDC|Class No./Book No. provided by the RC
 Keywords|Special keywords of the book (e.g. category, genre, etc)
-Summary|Short description about the book
+Summary|Description about the book
 
 
 ## API Serving (FastAPI)
@@ -157,7 +157,7 @@ Books with both summary and keywords|26649 |84.51%
 
 ## Setup
 
-It is not recommended to scrap for the data again as it took 17 hours to scrap this detailed data. And hence the modules for that are not written inside `requirements.txt`.
+It is not recommended to scrape for the data again, as it took 17 hours to scrape this detailed data. And hence the modules for that are not written inside `requirements.txt`.
 
 If you still want to execute the whole procedure on your system, follow the instructions mentioned in the section [Workflow](#workflow).
 
@@ -166,16 +166,16 @@ If you still want to execute the whole procedure on your system, follow the inst
 In a command prompt shell, open the repository folder and run `pip install -r requirements.txt`
 
 
-### To setup the server in your local system, there are two methods depending on your need:
+### To setup the server in your local system, there are two methods depending on your needs:
 
-* If you are okay with hosting the at `127.0.0.1:8000`:
+* If you are okay with hosting the server at `127.0.0.1:8000`:
   1. Open Command Prompt in the folder where `API.py` is located.
   2. Run `python API.py`
   3. The server has started at `127.0.0.1:8000` !
 
 * If you want to host the server at your own choice of address and port:
   1. Open Command Prompt in the folder where `API.py` is located.
-  2. Run `uvicorn API:app -h <address> -p <port>`
+  2. Run `uvicorn API:app --host <address> --port <port>`
   3. Now the server has started at the address and port of your choice!
 
 
