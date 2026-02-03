@@ -1,6 +1,6 @@
 # LLM Usage log
 
-When working on this project we used LLMs for minor bug fixes and to use multithreading in our code which is shown below.
+When working on this project, we used LLMs for minor bug fixes and to use multithreading in our code, which is shown below.
 
 # Prompt 1
 How to use multi threading in this code:
@@ -109,10 +109,10 @@ with ThreadPoolExecutor(max_workers=5) as executor:
 
 ### Why this works well
 
-* ✔ **Threads overlap waiting time** (HTTP requests)
-* ✔ No GIL issues (network I/O releases GIL)
-* ✔ Clean error handling
-* ✔ Easy to control speed via `max_workers`
+* **Threads overlap waiting time** (HTTP requests) ✔
+* No GIL issues (network I/O releases GIL) ✔
+* Clean error handling ✔
+* Easy to control speed via `max_workers` ✔
 
 
 ### Important ⚠️ (VERY relevant to your earlier Google API quota question)
