@@ -92,23 +92,21 @@ Database: `SQLite3`
 
 Method: `pandas.DataFrame.to_sql()`
 
-
 ### Standardized Schema:
-Column Name| Column Description
----|---
-AccNo|Accession Number
-AccDate| Accession Date
-Title|Name of the book
-ISBN|ISBN of the book (given by RC)
-ISBN13|ISBN13 of the book
-Author|Author of the book
-Publisher|Place and publisher of the book
-Year|Year of publishing the book
-Pages|Number of pages in the book
-DDC|Class No./Book No. provided by the RC
-Keywords|Special keywords of the book (e.g. category, genre, etc)
-Summary|Description about the book
-
+Column Name| Column Description | Type | Null Counts
+---|---|---|---
+AccNo|Accession Number| `int64`| 0
+AccDate| Accession Date | `str` | 144
+Title|Name of the book | `str` | 0
+ISBN|ISBN of the book (given by RC) | `str` | 0
+ISBN13|ISBN13 of the book | `str` | 0
+Author|Author of the book | `str` | 0
+Publisher|Place and publisher of the book | `str` | 0
+Year|Year of publishing the book | `float64` | 7
+Pages|Number of pages in the book | `str` | 105
+DDC|Class No./Book No. provided by the RC | `str` | 0
+Keywords|Special keywords of the book (e.g. category, genre, etc) | `str` | 4268
+Summary|Description about the book | `str` | 4011
 
 ## API Serving (FastAPI)
 End Points
